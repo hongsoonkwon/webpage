@@ -17,3 +17,15 @@ p {
     font-size: 1rem;
     font-weight: 400;
 }
+
+.card {
+    background-color: black;
+    width: 300px;
+    color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 10px white;
+    text-align: center;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+}
