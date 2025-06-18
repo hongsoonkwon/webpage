@@ -20,7 +20,7 @@ p {
 
 .card {
     background-color: black;
-    width: 300px;
+    max-width: 300px;
     color: white;
     border-radius: 12px;
     overflow: hidden;
