@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>일기 작성</title>
+  <title>📝 Write Diary 📝</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,16 +11,22 @@
     <h2 class="side-bar">📝 Write Diary 📝</h2>
 
     <div class="diary-container">
-      <input type="text" id="diary-title" placeholder="제목을 입력하세요" class="diary-search" />
-      <textarea id="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
+      <input id="diary-title" name="diary-title" type="text" placeholder="제목을 입력하세요" />
+      <textarea id="diary-content" name="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
       <br><br>
-      <button class="add-diary-btn" onclick="saveDiary()">저장하기</button>
+      <button id="save-btn" name="save-btn" class="add-diary-btn">저장하기</button>
     </div>
   </section>
+
   <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwZi35S9TfLPdmHIg8bPjW6RS-QJdoYB3fxU947bR0VYYlh4701kUJaOj86E1grIQMVzg/exec';
     const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
-  
+    const saveBtn = document.getElementById('save-btn');
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.has('edit') ? parseInt(urlParams.get('edit'), 10) : null;
+
     function formatDate(date) {
       const yyyy = date.getFullYear();
       const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -30,43 +36,80 @@
       const ss = String(date.getSeconds()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
     }
-  
+
+    // 편집 모드일 경우 기존 데이터 로드
+    if (editId !== null) {
+      fetch(GAS_URL)
+        .then(res => res.json())
+        .then(diaries => {
+          const entry = diaries[editId];
+          if (entry) {
+            titleInput.value = entry.title;
+            contentInput.value = entry.content;
+          }
+        })
+        .catch(err => console.error('편집용 일기 로드 실패:', err));
+    }
+
     function saveDiary() {
-      
-  console.log("✅ saveDiary() 실행됨!");
       const title = titleInput.value.trim();
       const content = contentInput.value.trim();
-  
       if (!title || !content) {
         alert('제목과 내용을 모두 입력해주세요');
         return;
       }
-  
-      const diaryData = {
-        title,
-        content,
-        time: formatDate(new Date()), // ✅ 여기서 time 필드로 포맷 넣기!!
-      };
-  
-      fetch('https://script.google.com/macros/s/AKfycbwZi35S9TfLPdmHIg8bPjW6RS-QJdoYB3fxU947bR0VYYlh4701kUJaOj86E1grIQMVzg/exec', {
+
+      const diaryData = editId !== null
+        ? { contents: null } // 추후 서버에 bulk update payload
+        : { title, content };
+
+      // 신규 작성일 때
+      if (editId === null) {
+        diaryData.time = formatDate(new Date());
+      } else {
+        // 편집 시 전체 목록을 가져와 수정 후 다시 전송
+        fetch(GAS_URL)
+          .then(res => res.json())
+          .then(diaries => {
+            diaries[editId].title = title;
+            diaries[editId].content = content;
+            return fetch(GAS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: diaries })
+            });
+          })
+          .then(res => res.text())
+          .then(() => {
+            alert('수정 완료되었습니다');
+            location.href = 'diary.html';
+          })
+          .catch(err => {
+            console.error('수정 실패:', err);
+            alert('수정에 실패했습니다');
+          });
+        return;
+      }
+
+      // 신규 작성일 경우 POST 요청
+      fetch(GAS_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(diaryData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(diaryData)
       })
-        .then((res) => res.json())
-        .then((data) => {
+        .then(res => res.json())
+        .then(data => {
           alert(data.message || '일기가 저장되었습니다');
-          window.location.href = 'diary.html';
+          location.href = 'diary.html';
         })
-        .catch((err) => {
-          console.error('에러 발생:', err);
+        .catch(err => {
+          console.error('서버 저장 실패:', err);
           alert('서버 저장에 실패했습니다');
         });
     }
+
+    saveBtn.addEventListener('click', saveDiary);
+  });
   </script>
-  
-  
 </body>
 </html>
