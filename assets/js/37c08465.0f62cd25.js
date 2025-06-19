@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite_renewal=self.webpackChunkwebsite_renewal||[]).push([[2039],{1629:(e,a,t)=>{t.r(a),t.d(a,{default:()=>r});t(6540);var n=t(6347),o=t(6372),s=t(6579),l=t(4848);function r(){const e=(0,n.zy)(),a=(0,n.W6)();let t=e.pathname,r=a.location.pathname===s.oJ?s.Wm:a.location.pathname;return(0,l.jsx)(o.a,{from:t,to:r})}}}]);
