@@ -1,0 +1,4 @@
+# _config.yml
+exclude:
+  - diary_app/node_modules
+  - node_modules      # (루트에 node_modules 도 있으면)
