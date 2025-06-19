@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Diary Entry</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -21,34 +21,59 @@
     </div>
   </section>
 
-  <!-- 🔙 뒤로가기 버튼 -->
   <footer style="text-align: center; margin-top: 40px;">
     <button class="add-diary-btn" onclick="goBack()">🔙 목록으로 돌아가기</button>
   </footer>
 
   <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwZi35S9TfLPdmHIg8bPjW6RS-QJdoYB3fxU947bR0VYYlh4701kUJaOj86E1grIQMVzg/exec";
     const urlParams = new URLSearchParams(window.location.search);
-    const index = urlParams.get('id');
-    const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
+    const targetId = parseInt(urlParams.get('id'), 10);
 
-    if (!index || !diaries[index]) {
-      document.getElementById('entry-title').innerText = "일기를 불러올 수 없습니다.";
-    } else {
-      const entry = diaries[index];
-      document.getElementById('entry-title').innerText = "제목: " + entry.title;
-      document.getElementById('entry-content').innerText = "내용:\n" + entry.content;
-    }
+    fetch(GAS_URL)
+      .then((res) => res.json())
+      .then((diaries) => {
+        const entry = diaries.find((_, i) => i === targetId);
+
+        if (!entry) {
+          document.getElementById("entry-title").innerText = "일기를 불러올 수 없습니다.";
+          return;
+        }
+
+        document.getElementById("entry-title").innerText = "제목: " + entry.title;
+        document.getElementById("entry-content").innerText = "내용:\n" + entry.content;
+
+        window.currentIndex = targetId;
+        window.allEntries = diaries;
+      })
+      .catch((err) => {
+        console.error("서버에서 일기를 불러오지 못했습니다:", err);
+        document.getElementById("entry-title").innerText = "일기를 불러올 수 없습니다.";
+      });
 
     function editDiary() {
-      location.href = `write_diary.html?edit=${index}`;
+      location.href = `write_diary.html?edit=${targetId}`;
     }
 
     function deleteDiary() {
-      if (!confirm("정말 삭제하시겠습니까? 😥")) return;
-      diaries.splice(index, 1);
-      localStorage.setItem('diaries', JSON.stringify(diaries));
-      alert("삭제 완료되었습니다!");
-      location.href = "diary.html";
+      if (!confirm("정말 삭제하시겠습니까?")) return;
+
+      const updated = window.allEntries.filter((_, i) => i !== window.currentIndex);
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: updated }),
+      })
+        .then(res => res.text())
+        .then(() => {
+          alert("삭제 완료되었습니다");
+          location.href = "diary.html";
+        })
+        .catch((err) => {
+          console.error("삭제 실패:", err);
+          alert("삭제에 실패했습니다");
+        });
     }
 
     function goBack() {

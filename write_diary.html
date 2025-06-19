@@ -17,49 +17,56 @@
       <button class="add-diary-btn" onclick="saveDiary()">저장하기</button>
     </div>
   </section>
-
   <script>
     const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
-
-    const params = new URLSearchParams(window.location.search);
-    const editIndex = params.get('edit');
-
-    if (editIndex !== null) {
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
-      if (diaries[editIndex]) {
-        titleInput.value = diaries[editIndex].title;
-        contentInput.value = diaries[editIndex].content;
-      }
+  
+    function formatDate(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
     }
-
+  
     function saveDiary() {
+      
+  console.log("✅ saveDiary() 실행됨!");
       const title = titleInput.value.trim();
       const content = contentInput.value.trim();
-
+  
       if (!title || !content) {
-        alert('제목과 내용을 모두 입력해주세요!');
+        alert('제목과 내용을 모두 입력해주세요');
         return;
       }
-
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
-
+  
       const diaryData = {
         title,
         content,
-        timestamp: new Date().toISOString(),
+        time: formatDate(new Date()), // ✅ 여기서 time 필드로 포맷 넣기!!
       };
-
-      if (editIndex !== null) {
-        diaries[editIndex] = diaryData;
-      } else {
-        diaries.push(diaryData);
-      }
-
-      localStorage.setItem('diaries', JSON.stringify(diaries));
-      alert('일기가 저장되었습니다!');
-      window.location.href = 'diary.html';
+  
+      fetch('https://script.google.com/macros/s/AKfycbwZi35S9TfLPdmHIg8bPjW6RS-QJdoYB3fxU947bR0VYYlh4701kUJaOj86E1grIQMVzg/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(diaryData),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert(data.message || '일기가 저장되었습니다');
+          window.location.href = 'diary.html';
+        })
+        .catch((err) => {
+          console.error('에러 발생:', err);
+          alert('서버 저장에 실패했습니다');
+        });
     }
   </script>
+  
+  
 </body>
 </html>

@@ -7,9 +7,9 @@
 </head>
 
 <body>
-  <section class="main-content">
     <footer class="breadcrumb">SK's view &gt; Diary</footer>
     <h2 class="side-bar">📬 Diary 📬</h2>
+  <section class="main-content">
     <div class="diary-container">
       <input type="text" placeholder="일기 제목 검색..." class="diary-search" onkeyup="filterDiaries()" />
 
@@ -22,43 +22,51 @@
   <footer style="text-align:center;">
     <button class="add-diary-btn" onclick="location.href='write_diary.html'">+ 새 일기 쓰기</button>
   </footer>
-
   <script>
     function filterDiaries() {
       const input = document.querySelector('.diary-search');
       const filter = input.value.toLowerCase();
       const diaryBoxes = document.querySelectorAll('.diary-box');
-
+  
       diaryBoxes.forEach(box => {
         const title = box.querySelector('h3').innerText.toLowerCase();
         box.style.display = title.includes(filter) ? 'block' : 'none';
       });
     }
-
+  
     function loadDiaries() {
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
-
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
-
-      if (diaries.length === 0) {
-        diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
-        return;
-      }
-
-      diaries.forEach((d, index) => {
-  const box = document.createElement('div');
-  box.className = 'diary-box';
-  box.innerHTML = `
-    <h3>${d.title}</h3>
-    <p>${d.content.slice(0, 50)}...</p>
-  `;
-  box.onclick = () => location.href = `diary_entry.html?id=${index}`;  // 요기!!!
-  diaryList.appendChild(box);
-});
+  
+      fetch('https://script.google.com/macros/s/AKfycbwZi35S9TfLPdmHIg8bPjW6RS-QJdoYB3fxU947bR0VYYlh4701kUJaOj86E1grIQMVzg/exec')
+        .then(res => res.json())
+        .then(diaries => {
+          
+    console.log('서버에서 받은 일기 목록:', diaries); // 확인!!
+          if (diaries.length === 0) {
+            diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
+            return;
+          }
+  
+          diaries.forEach(d => {
+            const box = document.createElement('div');
+            box.className = 'diary-box';
+            box.innerHTML = `
+              <h3>${d.title}</h3>
+              <p>${d.content.slice(0, 50)}...</p>
+            `;
+            box.onclick = () => location.href = `diary_entry.html?id=${d.index}`; // ✅ 서버 index 사용
+            diaryList.appendChild(box);
+          });
+        })
+        .catch(err => {
+          console.error('서버에서 일기 목록 불러오기 실패:', err);
+          diaryList.innerHTML = '<p style="text-align:center; color:red;">서버 연결에 실패했습니다</p>';
+        });
     }
-
+  
     window.onload = loadDiaries;
   </script>
+  
 </body>
 </html>

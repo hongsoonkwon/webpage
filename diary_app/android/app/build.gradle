@@ -52,3 +52,10 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+ext {
+    compileSdkVersion = 35
+    minSdkVersion = 22
+    targetSdkVersion = 35
+    // 기타 변수...
+}

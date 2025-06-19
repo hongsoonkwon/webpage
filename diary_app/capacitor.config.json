@@ -1,6 +1,6 @@
 {
-    "appId": "com.hongsk.diary",
-    "appName": "MyDiary",
-    "webDir": "www",
-    "bundledWebRuntime": false
-  }
+  "appId": "com.hongsk.diary",
+  "appName": "MyDiary",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

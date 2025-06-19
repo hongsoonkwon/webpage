@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>일기 작성</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section class="main-content">
+    <footer class="breadcrumb">SK's view &gt; Diary</footer>
+    <h2 class="side-bar">📝 Write Diary 📝</h2>
+
+    <div class="diary-container">
+      <input type="text" id="diary-title" placeholder="제목을 입력하세요" class="diary-search" />
+      <textarea id="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
+      <br><br>
+      <button class="add-diary-btn" onclick="saveDiary()">저장하기</button>
+    </div>
+  </section>
+  <script>
+    const titleInput = document.getElementById('diary-title');
+    const contentInput = document.getElementById('diary-content');
+  
+    function formatDate(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    }
+  
+    function saveDiary() {
+      const title = titleInput.value.trim();
+      const content = contentInput.value.trim();
+  
+      if (!title || !content) {
+        alert('제목과 내용을 모두 입력해주세요');
+        return;
+      }
+  
+      const diaryData = {
+        title,
+        content,
+        time: formatDate(new Date()), // ✅ 여기서 time 필드로 포맷 넣기!!
+      };
+  
+      fetch('http://localhost:3000/api/diary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(diaryData),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert(data.message || '일기가 저장되었습니다');
+          window.location.href = 'diary.html';
+        })
+        .catch((err) => {
+          console.error('에러 발생:', err);
+          alert('서버 저장에 실패했습니다');
+        });
+    }
+  </script>
+  
+  
+</body>
+</html>
