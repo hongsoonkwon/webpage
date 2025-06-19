@@ -32,9 +32,9 @@
     function loadDiaries() {
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
-
-      fetch('https://script.google.com/macros/s/AKfycbwixWHG9wGobGM8WgzPfQr9KDN3So41Z8lGVExgXTmq3SwES16dT1GnkaBl1EnZ3ydRsw/exec')
-        .then(res => res.json())
+      
+      fetch("https://script.google.com/macros/s/AKfycbwixWHG9wGobGM8WgzPfQr9KDN3So41Z8lGVExgXTmq3SwES16dT1GnkaBl1EnZ3ydRsw/exec")
+    .then(res => res.json())
         .then(diaries => {
           console.log('서버에서 받은 일기 목록:', diaries);
           if (diaries.length === 0) {
