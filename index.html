@@ -2,35 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>순권이의 이야기</title>
+    <title>반갑소</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     
   <div class="main-content">
-    <header class="top-bar">
-        <div class = "logo">Hi</div>
-        <nav class ="top-nav">
-            <a href = "#">후원</a>
-            <a href = "#">로그인</a>
-            <a href = "#">기타</a>
+        <header class="top-bar">
+          <div class="logo">Hi</div>
+          <nav class="top-nav">
+              <!-- 🔽 날씨 표시 영역 -->
+              <div id="weather" style="color: black;font-size:14px">날씨 로딩 중...</div>
+          </nav>
         </nav>
     </header>
 
 <section class="main-title">
-    <h1>순권이의 이야기</h1>
+    <h1>반갑소</h1>
     <p>SK's story</p>
 </section>
 
 <nav class="main-menu">
-    <a class="active" href="#" onclick="loadPage(this,'aboutme.html')">About me</a>
+    <a class="#" href="#" onclick="loadPage(this,'aboutme.html')">About me</a>
     <a href="#" onclick="loadPage(this,'study.html')">Study</a>
     <a href="#" onclick="loadPage(this,'diary.html')">diary</a>
     <a href="#" onclick="loadPage(this,'etc.html')">기타</a>
   </nav>
   
-  <iframe id="main-frame" src="aboutme.html" frameborder="0" width="100%" height="800px"></iframe>
+  <iframe id="main-frame" frameborder="0" width="100%" height="800px"></iframe>
   
   <script>
 function loadPage(element, page) {
@@ -54,6 +54,39 @@ function loadPage(element, page) {
     </nav>
     © 2025 Soonkwon Hong.
   </footer>
+ <!-- ✅ 날씨 JS -->
+ <script type="module">
+  const API_KEY = '74b58e8166d30d4565f0d05f2399f0d1';  // ✅ 본인 키
+
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=Pohang&appid=${API_KEY}&units=metric&lang=kr`
+    );
+    const weather = await response.json();
+
+    console.log('응답:', weather);
+
+    const weatherDiv = document.getElementById('weather');
+
+    if (!weather.main || !weather.weather) {
+      weatherDiv.innerText = '날씨 불러오기 실패';
+    } else {
+      const temp = weather.main.temp;
+      const description = weather.weather[0].description;
+      const icon = weather.weather[0].icon;
+      const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+      weatherDiv.innerHTML = `
+        <img src="${iconUrl}" alt="날씨 아이콘" style="vertical-align:middle; width:28px; height:28px;">
+        <span style="font-size: 14px;">포항: ${temp}°C, ${description}</span>
+      `;
+    }
+  } catch (err) {
+    console.error('날씨 API 오류:', err);
+    document.getElementById('weather').innerText = '날씨 정보를 가져오지 못했습니다.';
+  }
+</script>
+
 
 </body>
 
