@@ -1,0 +1,17 @@
+<body>
+    <section class="diary-container">
+      <h2 id="view-title"></h2>
+      <p id="view-content" style="white-space: pre-wrap;"></p>
+    </section>
+  
+    <script>
+      const diary = JSON.parse(localStorage.getItem("selectedDiary"));
+      if (diary) {
+        document.getElementById("view-title").innerText = diary.title;
+        document.getElementById("view-content").innerText = diary.content;
+      } else {
+        document.body.innerHTML = "<p>일기를 찾을 수 없습니다 😢</p>";
+      }
+    </script>
+  </body>
+  

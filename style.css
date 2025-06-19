@@ -1,8 +1,11 @@
 body {
+  height:100%;
     margin: 0;
     font-family: 'Noto Sans KR', sans-serif;
     color: #333;
     background-color: #fff;
+    display: flex;
+    flex-direction: column;
   }
   
   .profile-image {
@@ -201,3 +204,60 @@ body {
     position: relative;       /* 필요 시 fixed도 가능! */
     bottom: 0;
   }
+  
+  .main-content {  /* ⚠️ 네가 쓰고 있는 메인 내용 영역에 class 주기!! */
+    flex: 1;
+    padding-bottom:100px;
+  }
+  
+
+  .diary-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+  
+  .diary-search {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .diary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .diary-box {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px 20px;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select:none;
+  }
+  
+  .diary-box:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .add-diary-btn {
+    background-color: #00cc66;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-size: 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .add-diary-btn:hover {
+    background-color: #00994d;
+  }
+  

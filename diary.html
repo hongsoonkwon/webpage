@@ -1,12 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>About Me</title>
+  <title>Diary</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
+<body>
+  <section class="main-content">
+    <footer class="breadcrumb">SK's view &gt; Diary</footer>
+    <h2 class="side-bar">📬 Diary 📬</h2>
+    <div class="diary-container">
+      <input type="text" placeholder="일기 제목 검색..." class="diary-search" onkeyup="filterDiaries()" />
 
-<section class="about-section">
-  <footer class="breadcrumb">SK's view &gt; diary</footer>
+      <div class="diary-list" id="diary-list">
+        <!-- JS로 일기 목록 로딩됨 -->
+      </div>
+    </div>
+  </section>
 
+  <footer style="text-align:center;">
+    <button class="add-diary-btn" onclick="location.href='write_diary.html'">+ 새 일기 쓰기</button>
+  </footer>
 
-</section>
+  <script>
+    function filterDiaries() {
+      const input = document.querySelector('.diary-search');
+      const filter = input.value.toLowerCase();
+      const diaryBoxes = document.querySelectorAll('.diary-box');
+
+      diaryBoxes.forEach(box => {
+        const title = box.querySelector('h3').innerText.toLowerCase();
+        box.style.display = title.includes(filter) ? 'block' : 'none';
+      });
+    }
+
+    function loadDiaries() {
+      const diaryList = document.getElementById('diary-list');
+      diaryList.innerHTML = '';
+
+      const diaries = JSON.parse(localStorage.getItem('diaryList') || '[]');
+
+      if (diaries.length === 0) {
+        diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
+        return;
+      }
+
+      diaries.forEach((d) => {
+        const box = document.createElement('div');
+        box.className = 'diary-box';
+        box.innerHTML = `
+          <h3>${d.title}</h3>
+          <p>${d.content.slice(0, 50)}...</p>
+        `;
+        box.onclick = () => {
+          localStorage.setItem('selectedDiary', JSON.stringify(d));
+          location.href = 'diary_entry.html';
+        };
+        diaryList.appendChild(box);
+      });
+    }
+
+    window.onload = loadDiaries;
+  </script>
+</body>
+</html>
