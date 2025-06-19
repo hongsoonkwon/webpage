@@ -1,35 +1,64 @@
-<!-- write-diary.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>새 일기 쓰기</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>일기 작성</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2 style="text-align: center;">✍️ 새 일기 작성</h2>
-  <div style="max-width: 600px; margin: auto;">
-    <input type="text" id="diary-title" placeholder="제목을 입력하세요" style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-    <textarea id="diary-content" placeholder="내용을 입력하세요" rows="10" style="width: 100%; padding: 10px;"></textarea>
-    <button onclick="saveDiary()" style="margin-top: 10px;">저장하기</button>
-  </div>
+  <section class="main-content">
+    <footer class="breadcrumb">SK's view &gt; Diary</footer>
+    <h2 class="side-bar">📝 Write Diary 📝</h2>
+
+    <div class="diary-container">
+      <input type="text" id="diary-title" placeholder="제목을 입력하세요" class="diary-search" />
+      <textarea id="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
+      <br><br>
+      <button class="add-diary-btn" onclick="saveDiary()">저장하기</button>
+    </div>
+  </section>
 
   <script>
+    const titleInput = document.getElementById('diary-title');
+    const contentInput = document.getElementById('diary-content');
+
+    const params = new URLSearchParams(window.location.search);
+    const editIndex = params.get('edit');
+
+    if (editIndex !== null) {
+      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
+      if (diaries[editIndex]) {
+        titleInput.value = diaries[editIndex].title;
+        contentInput.value = diaries[editIndex].content;
+      }
+    }
+
     function saveDiary() {
-      const title = document.getElementById('diary-title').value;
-      const content = document.getElementById('diary-content').value;
+      const title = titleInput.value.trim();
+      const content = contentInput.value.trim();
 
       if (!title || !content) {
-        alert("제목과 내용을 모두 입력하세요!");
+        alert('제목과 내용을 모두 입력해주세요!');
         return;
       }
 
-      const existing = JSON.parse(localStorage.getItem("diaries") || "[]");
-      existing.push({ title, content });
-      localStorage.setItem("diaries", JSON.stringify(existing));
+      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
 
-      alert("일기가 저장되었어요!");
-      window.location.href = "diary.html";  // 다시 메인 페이지로 이동
+      const diaryData = {
+        title,
+        content,
+        timestamp: new Date().toISOString(),
+      };
+
+      if (editIndex !== null) {
+        diaries[editIndex] = diaryData;
+      } else {
+        diaries.push(diaryData);
+      }
+
+      localStorage.setItem('diaries', JSON.stringify(diaries));
+      alert('일기가 저장되었습니다!');
+      window.location.href = 'diary.html';
     }
   </script>
 </body>

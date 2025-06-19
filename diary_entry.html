@@ -1,17 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Diary Entry</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
-    <section class="diary-container">
-      <h2 id="view-title"></h2>
-      <p id="view-content" style="white-space: pre-wrap;"></p>
-    </section>
-  
-    <script>
-      const diary = JSON.parse(localStorage.getItem("selectedDiary"));
-      if (diary) {
-        document.getElementById("view-title").innerText = diary.title;
-        document.getElementById("view-content").innerText = diary.content;
-      } else {
-        document.body.innerHTML = "<p>일기를 찾을 수 없습니다 😢</p>";
-      }
-    </script>
-  </body>
-  
+  <section class="main-content">
+    <footer class="breadcrumb">SK's view &gt; Diary</footer>
+    <h2 class="side-bar">📬 Diary 📬</h2>
+
+    <div class="diary-container">
+      <h3 id="entry-title"></h3>
+      <p id="entry-content" style="white-space: pre-line;"></p>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="add-diary-btn" onclick="editDiary()">✏️ 수정</button>
+        <button class="add-diary-btn" onclick="deleteDiary()" style="background-color: #cc3333;">🗑️ 삭제</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔙 뒤로가기 버튼 -->
+  <footer style="text-align: center; margin-top: 40px;">
+    <button class="add-diary-btn" onclick="goBack()">🔙 목록으로 돌아가기</button>
+  </footer>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const index = urlParams.get('id');
+    const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
+
+    if (!index || !diaries[index]) {
+      document.getElementById('entry-title').innerText = "일기를 불러올 수 없습니다.";
+    } else {
+      const entry = diaries[index];
+      document.getElementById('entry-title').innerText = "제목: " + entry.title;
+      document.getElementById('entry-content').innerText = "내용:\n" + entry.content;
+    }
+
+    function editDiary() {
+      location.href = `write_diary.html?edit=${index}`;
+    }
+
+    function deleteDiary() {
+      if (!confirm("정말 삭제하시겠습니까? 😥")) return;
+      diaries.splice(index, 1);
+      localStorage.setItem('diaries', JSON.stringify(diaries));
+      alert("삭제 완료되었습니다!");
+      location.href = "diary.html";
+    }
+
+    function goBack() {
+      history.length > 1 ? history.back() : location.href = "diary.html";
+    }
+  </script>
+</body>
+</html>

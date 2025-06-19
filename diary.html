@@ -39,26 +39,23 @@
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
 
-      const diaries = JSON.parse(localStorage.getItem('diaryList') || '[]');
+      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
 
       if (diaries.length === 0) {
         diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
         return;
       }
 
-      diaries.forEach((d) => {
-        const box = document.createElement('div');
-        box.className = 'diary-box';
-        box.innerHTML = `
-          <h3>${d.title}</h3>
-          <p>${d.content.slice(0, 50)}...</p>
-        `;
-        box.onclick = () => {
-          localStorage.setItem('selectedDiary', JSON.stringify(d));
-          location.href = 'diary_entry.html';
-        };
-        diaryList.appendChild(box);
-      });
+      diaries.forEach((d, index) => {
+  const box = document.createElement('div');
+  box.className = 'diary-box';
+  box.innerHTML = `
+    <h3>${d.title}</h3>
+    <p>${d.content.slice(0, 50)}...</p>
+  `;
+  box.onclick = () => location.href = `diary_entry.html?id=${index}`;  // 요기!!!
+  diaryList.appendChild(box);
+});
     }
 
     window.onload = loadDiaries;

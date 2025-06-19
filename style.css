@@ -260,4 +260,25 @@ body {
   .add-diary-btn:hover {
     background-color: #00994d;
   }
+
+  .diary-entry {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #fdfdfd;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .diary-entry h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .diary-entry p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
   
