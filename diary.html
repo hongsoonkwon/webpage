@@ -33,7 +33,7 @@
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
       
-      fetch("https://script.google.com/macros/s/AKfycbwixWHG9wGobGM8WgzPfQr9KDN3So41Z8lGVExgXTmq3SwES16dT1GnkaBl1EnZ3ydRsw/exec")
+      fetch("https://script.google.com/macros/s/AKfycbxL2Cj999VEShdFU8b_UxbHt14zqf8gPBDC6RZ8GmrYvEg_JwPzGQrErQqVPCh7XAs04Q/exec")
     .then(res => res.json())
         .then(diaries => {
           console.log('서버에서 받은 일기 목록:', diaries);
