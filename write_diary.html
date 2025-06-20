@@ -20,8 +20,7 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx3oSA0_BMbVyIDwHuOhm5RZO9-X8a5qWpNgp_txtPbWVCTNFC4cs-oQNf8xaf9bbPE/exec";
-    
+    const API_BASE = "http://localhost:3000/api"; // 🌐 Node.js 백엔드 주소
     const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
     const saveBtn = document.getElementById('save-btn');
@@ -38,9 +37,9 @@
       return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
     }
 
-    // 편집 모드일 경우 기존 데이터 로드
+    // 편집 모드일 경우 기존 데이터 불러오기
     if (editId !== null) {
-      fetch(GAS_URL)
+      fetch(`${API_BASE}/diaries`)
         .then(res => res.json())
         .then(diaries => {
           const entry = diaries[editId];
@@ -55,34 +54,28 @@
     function saveDiary() {
       const title = titleInput.value.trim();
       const content = contentInput.value.trim();
+
       if (!title || !content) {
         alert('제목과 내용을 모두 입력해주세요');
         return;
       }
 
-      const diaryData = editId !== null
-        ? { contents: null } // 추후 서버에 bulk update payload
-        : { title, content };
-
-      // 신규 작성일 때
-      if (editId === null) {
-        diaryData.time = formatDate(new Date());
-      } else {
-        // 편집 시 전체 목록을 가져와 수정 후 다시 전송
-        fetch(GAS_URL)
+      // 편집 모드일 경우 전체 일기 받아서 수정 후 전체 전송
+      if (editId !== null) {
+        fetch(`${API_BASE}/diaries`)
           .then(res => res.json())
           .then(diaries => {
             diaries[editId].title = title;
             diaries[editId].content = content;
-            return fetch(GAS_URL, {
+            return fetch(`${API_BASE}/diaries`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ contents: diaries })
             });
           })
-          .then(res => res.text())
+          .then(res => res.json())
           .then(() => {
-            alert('수정 완료되었습니다');
+            alert('수정 완료되었습니다!');
             location.href = 'diary.html';
           })
           .catch(err => {
@@ -92,21 +85,31 @@
         return;
       }
 
-      // 신규 작성일 경우 POST 요청
-      fetch(GAS_URL, {
+      // 신규 작성
+      const diaryData = {
+        title,
+        content,
+        time: formatDate(new Date())
+      };
+
+      fetch(`${API_BASE}/diary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(diaryData)
       })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || '일기가 저장되었습니다');
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('일기가 저장되었습니다!');
           location.href = 'diary.html';
-        })
-        .catch(err => {
-          console.error('서버 저장 실패:', err);
-          alert('서버 저장에 실패했습니다');
-        });
+        } else {
+          throw new Error(data.message || '저장 실패');
+        }
+      })
+      .catch(err => {
+        console.error('서버 저장 실패:', err);
+        alert('서버 저장에 실패했습니다');
+      });
     }
 
     saveBtn.addEventListener('click', saveDiary);

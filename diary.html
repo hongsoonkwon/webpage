@@ -8,6 +8,7 @@
 <body>
   <footer class="breadcrumb">SK's view &gt; Diary</footer>
   <h2 class="side-bar">📬 Diary 📬</h2>
+
   <section class="main-content">
     <div class="diary-container">
       <input id="diary-search" name="diary-search" type="text" placeholder="일기 제목 검색..." class="diary-search" onkeyup="filterDiaries()" />
@@ -20,6 +21,8 @@
   </footer>
 
   <script>
+    const API_URL = "http://localhost:3000/api/diaries"; // 🌐 백엔드 주소로 수정
+
     function filterDiaries() {
       const input = document.getElementById('diary-search');
       const filter = input.value.toLowerCase();
@@ -32,9 +35,9 @@
     function loadDiaries() {
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
-      
-      fetch("https://script.google.com/macros/s/AKfycbx3oSA0_BMbVyIDwHuOhm5RZO9-X8a5qWpNgp_txtPbWVCTNFC4cs-oQNf8xaf9bbPE/exec")
-    .then(res => res.json())
+
+      fetch(API_URL)
+        .then(res => res.json())
         .then(diaries => {
           console.log('서버에서 받은 일기 목록:', diaries);
           if (diaries.length === 0) {

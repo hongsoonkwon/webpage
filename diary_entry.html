@@ -15,23 +15,23 @@
       <p id="entry-content" style="white-space: pre-line;"></p>
 
       <div style="text-align: right; margin-top: 20px;">
-        <button id="edit-btn" name="edit-btn" class="add-diary-btn" onclick="editDiary()">✏️ 수정</button>
-        <button id="delete-btn" name="delete-btn" class="add-diary-btn" onclick="deleteDiary()" style="background-color: #cc3333;">🗑️ 삭제</button>
+        <button id="edit-btn" class="add-diary-btn" onclick="editDiary()">✏️ 수정</button>
+        <button id="delete-btn" class="add-diary-btn" onclick="deleteDiary()" style="background-color: #cc3333;">🗑️ 삭제</button>
       </div>
     </div>
   </section>
 
   <footer style="text-align: center; margin-top: 40px;">
-    <button id="back-btn" name="back-btn" class="add-diary-btn" onclick="goBack()">🔙 목록으로 돌아가기</button>
+    <button id="back-btn" class="add-diary-btn" onclick="goBack()">🔙 목록으로 돌아가기</button>
   </footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbx3oSA0_BMbVyIDwHuOhm5RZO9-X8a5qWpNgp_txtPbWVCTNFC4cs-oQNf8xaf9bbPE/exec";
+      const API_BASE = "http://localhost:3000/api";
       const urlParams = new URLSearchParams(window.location.search);
       const targetId = parseInt(urlParams.get('id'), 10);
 
-      fetch(GAS_URL)
+      fetch(`${API_BASE}/diaries`)
         .then(res => res.json())
         .then(diaries => {
           const entry = diaries[targetId];
@@ -60,20 +60,20 @@
         if (!confirm("정말 삭제하시겠습니까?")) return;
         const updated = window.allEntries.filter((_, i) => i !== window.currentIndex);
 
-        fetch(GAS_URL, {
+        fetch(`${API_BASE}/diaries`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: updated })
         })
-          .then(res => res.text())
-          .then(() => {
-            alert("삭제 완료되었습니다");
-            location.href = "diary.html";
-          })
-          .catch(err => {
-            console.error("삭제 실패:", err);
-            alert("삭제에 실패했습니다");
-          });
+        .then(res => res.json())
+        .then(() => {
+          alert("삭제 완료되었습니다!");
+          location.href = "diary.html";
+        })
+        .catch(err => {
+          console.error("삭제 실패:", err);
+          alert("삭제에 실패했습니다");
+        });
       };
 
       window.goBack = () => {
