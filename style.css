@@ -75,6 +75,10 @@ body {
     display: flex;
     justify-content: center;
     padding: 10px 0;
+    width: 80%;
+    margin: 0 auto;         /* ← 가운데 정렬을 위한 margin 설정!!! */
+    border-radius: 8px;     /* ← 원하면 둥글게도 가능!! 옵션!! */
+    box-sizing: border-box; /* ← 패딩 포함한 전체 크기 관리!!! */
   }
   
   .main-menu a {
