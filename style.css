@@ -75,21 +75,26 @@ body {
     display: flex;
     justify-content: center;
     padding: 10px 0;
-    width: 80%;
-    margin: 0 auto;
+    width: 100%;
     box-sizing: border-box;
-    flex-wrap: wrap; /* 작아지면 다음 줄로 넘어가게!!! */
+    overflow-x: auto; /* 넘칠 때 스크롤 가능하게!!! */
   }
   
-  .main-menu a {
+  .menu-items {
+    display: flex;
+    flex-wrap: wrap; /* 화면 작아지면 줄바꿈! */
+    justify-content: center;
+    gap: 20px; /* 링크 사이 간격 */
+    max-width: 80%; /* 전체 넓이 제한 */
+  }
+  
+  .menu-items a {
     color: #ccc;
     text-decoration: none;
-    margin: 5px 10px;
-    padding: 8px 16px; /* 기존보다 줄여서 모바일 대응!!! */
+    padding: 8px 12px;
     font-size: 16px;
     font-weight: 500;
-    position: relative;
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    white-space: nowrap; /* 한 줄 유지 */
   }
   
   .main-menu a:hover {
