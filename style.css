@@ -76,19 +76,20 @@ body {
     justify-content: center;
     padding: 10px 0;
     width: 80%;
-    margin: 0 auto;         /* ← 가운데 정렬을 위한 margin 설정!!! */
-    border-radius: 8px;     /* ← 원하면 둥글게도 가능!! 옵션!! */
-    box-sizing: border-box; /* ← 패딩 포함한 전체 크기 관리!!! */
+    margin: 0 auto;
+    box-sizing: border-box;
+    flex-wrap: wrap; /* 작아지면 다음 줄로 넘어가게!!! */
   }
   
   .main-menu a {
     color: #ccc;
     text-decoration: none;
-    margin: 0 10px;
-    padding: 0 40px;
+    margin: 5px 10px;
+    padding: 8px 16px; /* 기존보다 줄여서 모바일 대응!!! */
     font-size: 16px;
     font-weight: 500;
     position: relative;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
   }
   
   .main-menu a:hover {
