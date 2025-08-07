@@ -5,17 +5,14 @@
   <title>Diary</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <section class="main-content">
-    <footer class="breadcrumb">SK's view &gt; Diary</footer>
-    <h2 class="side-bar">📬 Diary 📬</h2>
-    <div class="diary-container">
-      <input type="text" placeholder="일기 제목 검색..." class="diary-search" onkeyup="filterDiaries()" />
+  <footer class="breadcrumb">SK's view &gt; Diary</footer>
+  <h2 class="side-bar">📬 Diary 📬</h2>
 
-      <div class="diary-list" id="diary-list">
-        <!-- JS로 일기 목록 로딩됨 -->
-      </div>
+  <section class="main-content">
+    <div class="diary-container">
+      <input id="diary-search" name="diary-search" type="text" placeholder="일기 제목 검색..." class="diary-search" onkeyup="filterDiaries()" />
+      <div id="diary-list" class="diary-list"><!-- JS로 일기 목록 로딩됨 --></div>
     </div>
   </section>
 
@@ -24,12 +21,12 @@
   </footer>
 
   <script>
-    function filterDiaries() {
-      const input = document.querySelector('.diary-search');
-      const filter = input.value.toLowerCase();
-      const diaryBoxes = document.querySelectorAll('.diary-box');
+    const API_URL = "http://3.133.130.241:3000"; // 🌐 백엔드 주소로 수정
 
-      diaryBoxes.forEach(box => {
+    function filterDiaries() {
+      const input = document.getElementById('diary-search');
+      const filter = input.value.toLowerCase();
+      document.querySelectorAll('.diary-box').forEach(box => {
         const title = box.querySelector('h3').innerText.toLowerCase();
         box.style.display = title.includes(filter) ? 'block' : 'none';
       });
@@ -39,26 +36,33 @@
       const diaryList = document.getElementById('diary-list');
       diaryList.innerHTML = '';
 
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(diaries => {
+          console.log('서버에서 받은 일기 목록:', diaries);
+          if (diaries.length === 0) {
+            diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
+            return;
+          }
 
-      if (diaries.length === 0) {
-        diaryList.innerHTML = '<p style="text-align:center; color:gray;">등록된 일기가 없습니다.</p>';
-        return;
-      }
-
-      diaries.forEach((d, index) => {
-  const box = document.createElement('div');
-  box.className = 'diary-box';
-  box.innerHTML = `
-    <h3>${d.title}</h3>
-    <p>${d.content.slice(0, 50)}...</p>
-  `;
-  box.onclick = () => location.href = `diary_entry.html?id=${index}`;  // 요기!!!
-  diaryList.appendChild(box);
-});
+          diaries.forEach((d, idx) => {
+            const box = document.createElement('div');
+            box.className = 'diary-box';
+            box.innerHTML = `
+              <h3>${d.title}</h3>
+              <p>${d.content.slice(0, 50)}...</p>
+            `;
+            box.onclick = () => location.href = `diary_entry.html?id=${idx}`;
+            diaryList.appendChild(box);
+          });
+        })
+        .catch(err => {
+          console.error('서버 연결 실패:', err);
+          diaryList.innerHTML = '<p style="text-align:center; color:red;">서버 연결에 실패했습니다</p>';
+        });
     }
 
-    window.onload = loadDiaries;
+    document.addEventListener('DOMContentLoaded', loadDiaries);
   </script>
 </body>
 </html>

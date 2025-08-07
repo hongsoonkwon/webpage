@@ -79,15 +79,25 @@ body {
     max-width: 1000px;   /* 적절한 최대 너비 설정 */
     margin: 0 auto;      /* 수평 가운데 정렬 */
   }
+  .menu-scroll {
+    display: inline-flex;
+    gap: 20px;                 /* 메뉴 간 간격 */
+    padding: 0 20px;
+    min-width: max-content;    /* 메뉴가 한 줄로 쭉 나열되게!!! */
+  }
   
-  .main-menu a {
+  .menu-scroll a {
     color: #ccc;
     text-decoration: none;
-    margin: 0 10px;
-    padding: 0 40px;
     font-size: 16px;
     font-weight: 500;
-    position: relative;
+    padding: 8px 16px;
+    white-space: nowrap;
+    border-left: 1px solid #888;
+  }
+  
+  .menu-scroll a:first-child {
+    border-left: none;
   }
   
   .main-menu a:hover {
@@ -112,9 +122,9 @@ body {
   /* 하단 빵부스러기(경로 표시) */
   .breadcrumb {
     padding: 15px 25px;
-    background: #f7f7f7;
+    background: #f2f2f2;
     font-size: 12px;
-    color: #777;
+    color: #555;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -208,13 +218,14 @@ body {
     bottom: 0;
   }
   
-  .main-content {  /* ⚠️ 네가 쓰고 있는 메인 내용 영역에 class 주기!! */
-    flex: 1;
-    padding-bottom:100px;
+  .main-content {
+    width: 80%;
+    margin: 0 auto;           /* 👉 중앙 정렬 핵심!! */
   }
   
 
   .diary-container {
+    margin-top: 20px;
     max-width: 800px;
     margin: 20px auto;
     padding: 0 20px;

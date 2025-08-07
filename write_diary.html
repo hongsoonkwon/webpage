@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>일기 작성</title>
+  <title>📝 Write Diary 📝</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,26 +11,44 @@
     <h2 class="side-bar">📝 Write Diary 📝</h2>
 
     <div class="diary-container">
-      <input type="text" id="diary-title" placeholder="제목을 입력하세요" class="diary-search" />
-      <textarea id="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
+      <input id="diary-title" name="diary-title" type="text" placeholder="제목을 입력하세요" />
+      <textarea id="diary-content" name="diary-content" rows="10" placeholder="내용을 입력하세요" style="width:100%; padding:12px; font-size:16px; border-radius:8px; border:1px solid #ccc;"></textarea>
       <br><br>
-      <button class="add-diary-btn" onclick="saveDiary()">저장하기</button>
+      <button id="save-btn" name="save-btn" class="add-diary-btn">저장하기</button>
     </div>
   </section>
 
   <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE = "http://3.133.130.241:3000"; // 🌐 Node.js 백엔드 주소
     const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
+    const saveBtn = document.getElementById('save-btn');
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.has('edit') ? parseInt(urlParams.get('edit'), 10) : null;
 
-    const params = new URLSearchParams(window.location.search);
-    const editIndex = params.get('edit');
+    function formatDate(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const ss = String(date.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    }
 
-    if (editIndex !== null) {
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
-      if (diaries[editIndex]) {
-        titleInput.value = diaries[editIndex].title;
-        contentInput.value = diaries[editIndex].content;
-      }
+    // 편집 모드일 경우 기존 데이터 불러오기
+    if (editId !== null) {
+      fetch(`${API_BASE}/diaries`)
+        .then(res => res.json())
+        .then(diaries => {
+          const entry = diaries[editId];
+          if (entry) {
+            titleInput.value = entry.title;
+            contentInput.value = entry.content;
+          }
+        })
+        .catch(err => console.error('편집용 일기 로드 실패:', err));
     }
 
     function saveDiary() {
@@ -38,28 +56,64 @@
       const content = contentInput.value.trim();
 
       if (!title || !content) {
-        alert('제목과 내용을 모두 입력해주세요!');
+        alert('제목과 내용을 모두 입력해주세요');
         return;
       }
 
-      const diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
+      // 편집 모드일 경우 전체 일기 받아서 수정 후 전체 전송
+      if (editId !== null) {
+        fetch(`${API_BASE}/diaries`)
+          .then(res => res.json())
+          .then(diaries => {
+            diaries[editId].title = title;
+            diaries[editId].content = content;
+            return fetch(`${API_BASE}/diaries`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: diaries })
+            });
+          })
+          .then(res => res.json())
+          .then(() => {
+            alert('수정 완료되었습니다!');
+            location.href = 'diary.html';
+          })
+          .catch(err => {
+            console.error('수정 실패:', err);
+            alert('수정에 실패했습니다');
+          });
+        return;
+      }
 
+      // 신규 작성
       const diaryData = {
         title,
         content,
-        timestamp: new Date().toISOString(),
+        time: formatDate(new Date())
       };
 
-      if (editIndex !== null) {
-        diaries[editIndex] = diaryData;
-      } else {
-        diaries.push(diaryData);
-      }
-
-      localStorage.setItem('diaries', JSON.stringify(diaries));
-      alert('일기가 저장되었습니다!');
-      window.location.href = 'diary.html';
+      fetch(`${API_BASE}/diary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(diaryData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('일기가 저장되었습니다!');
+          location.href = 'diary.html';
+        } else {
+          throw new Error(data.message || '저장 실패');
+        }
+      })
+      .catch(err => {
+        console.error('서버 저장 실패:', err);
+        alert('서버 저장에 실패했습니다');
+      });
     }
+
+    saveBtn.addEventListener('click', saveDiary);
+  });
   </script>
 </body>
 </html>
